@@ -16,12 +16,13 @@ router.get('/', async (req, res) => {
 // Add new transaction (protected via auth middleware)
 router.post('/', auth, async (req, res) => {
   try {
-    const { type, amount, description, proofImage } = req.body;
+    const { type, amount, description, proofImage, date } = req.body;
     
     const newTransaction = new Transaction({
       type,
       amount: Number(amount),
       description,
+      ...(date && { date: new Date(date) }),
       ...(proofImage && { proofImage })
     });
 
