@@ -29,7 +29,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('🎈 Kidsland Backend is running successfully!');
+  res.send(' Kidsland Backend is running successfully!');
 });
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
