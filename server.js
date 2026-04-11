@@ -35,7 +35,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
 
 // MongoDB connection mapping to Vercel env
-const dbURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/kidsland';
+const dbURI = process.env.MONGODB_URI || 'mongodb+srv://kidsland_1:Kidsland%4012345@cluster0.ptiwh.mongodb.net/kidsland?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(dbURI)
 .then(async () => {
