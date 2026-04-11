@@ -52,11 +52,13 @@ mongoose.connect(dbURI)
   } catch (err) {
     console.error('Failed to seed admin', err);
   }
+}).catch(err => console.error('MongoDB connection error', err));
 
+if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
-})
-.catch((err) => {
-  console.error('Failed to connect to MongoDB', err);
-});
+}
+
+// Export for Vercel Serverless
+module.exports = app;
