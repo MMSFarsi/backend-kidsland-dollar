@@ -11,18 +11,33 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://backend-kidsland-dollar.vercel.app'];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.includes('localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Serve uploaded images statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('🎈 Kidsland Backend is running successfully!');
+});
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
 
-// MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/kidsland')
+// MongoDB connection mapping to Vercel env
+const dbURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/kidsland';
+
+mongoose.connect(dbURI)
 .then(async () => {
   console.log('Connected to MongoDB');
   
