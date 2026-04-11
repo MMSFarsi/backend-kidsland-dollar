@@ -11,7 +11,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://backend-kidsland-dollar.vercel.app'];
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:5174', 
+  'https://backend-kidsland-dollar.vercel.app',
+  'https://frontend-dollar-expense.vercel.app'
+];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.includes('localhost')) {
