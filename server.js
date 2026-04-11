@@ -39,6 +39,15 @@ app.get('/', (req, res) => {
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
 
+// Global Error Handler for better debugging instead of HTML 500s
+app.use((err, req, res, next) => {
+  console.error("Vercel Global Error:", err);
+  res.status(500).json({ 
+    message: 'Internal Application Error', 
+    details: err.message || err 
+  });
+});
+
 // MongoDB connection mapping to Vercel env
 const dbURI = process.env.MONGODB_URI || 'mongodb+srv://kidsland_1:Kidsland%4012345@cluster0.ptiwh.mongodb.net/kidsland?retryWrites=true&w=majority&appName=Cluster0';
 

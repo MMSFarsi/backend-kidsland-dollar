@@ -15,8 +15,7 @@ const transactionSchema = new mongoose.Schema({
     required: true
   },
   proofImage: {
-    type: String, // path to image
-    required: true
+    type: String // optional base64 image data
   },
   date: {
     type: Date,
