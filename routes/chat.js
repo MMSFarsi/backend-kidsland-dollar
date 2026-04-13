@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Transaction = require('../models/Transaction');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 
 router.post('/', auth, async (req, res) => {
   try {
@@ -10,18 +10,16 @@ router.post('/', auth, async (req, res) => {
     if (!message) return res.status(400).json({ message: "No message provided" });
 
     // Validate API Key exists
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return res.status(503).json({ 
-        message: "SYSTEM ERROR: You have not added your 'GEMINI_API_KEY' to your Vercel Environment Variables yet! Please add it to talk to the AI." 
+        message: "SYSTEM ERROR: You have not added your 'GROQ_API_KEY' to your Vercel Environment Variables yet! Please add it to talk to the AI." 
       });
     }
 
     // 1. Fetch raw Database context for RAG
-    // Sort oldest first so the AI understands timeline
     const transactions = await Transaction.find().sort({ date: 1 });
     
-    // Compressing to save context window tokens
     const compressedDb = transactions.map(t => 
       `{${t.date.toISOString().split('T')[0]},${t.type},${t.amount},"${t.description}"}`
     ).join(' | ');
@@ -34,18 +32,21 @@ router.post('/', auth, async (req, res) => {
     
     Strictly answer the owner's questions using ONLY the math and data from this context provided above. Address them respectfully. Keep answers under 3 paragraphs.`;
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
-      systemInstruction: systemPrompt 
+    const groq = new Groq({ apiKey });
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      model: 'llama-3.3-70b-versatile',
     });
 
-    const result = await model.generateContent(message);
-    const aiResponse = result.response.text();
+    const aiResponse = chatCompletion.choices[0]?.message?.content || "No response generated.";
 
     res.json({ reply: aiResponse });
   } catch (err) {
-    console.error("Gemini API Error:", err);
+    console.error("Groq API Error:", err);
     res.status(500).json({ message: "AI processing failed. Check your API key or server logs.", details: err.message });
   }
 });
