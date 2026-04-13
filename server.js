@@ -38,6 +38,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/chat', require('./routes/chat'));
 
 // Global Error Handler for better debugging instead of HTML 500s
 app.use((err, req, res, next) => {
