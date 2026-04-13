@@ -33,4 +33,19 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+// Delete a transaction (protected via auth middleware)
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const transaction = await Transaction.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+    
+    await Transaction.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Transaction removed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+});
+
 module.exports = router;
